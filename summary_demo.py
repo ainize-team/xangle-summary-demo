@@ -45,7 +45,7 @@ def process(context, category):
 
     summary = ''
 
-    for i, sub_category in enumerate(sub_categories[category]):
+    for i, sub_category in enumerate(SUB_CATEGORIES[category]):
         '''
         TODO
         - API 연동하기
