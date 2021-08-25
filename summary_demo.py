@@ -9,11 +9,12 @@ preprocessor = Preprocessor()
 preprocessor.pipe(normalize_whitespace)
 preprocessor.pipe(fix_bad_unicode)
 
+# TODO: 필요한 카테고리 더 추가하기
 class Categories(str, Enum):
-    new_listing = 'New Listing'
-    new_partnership = 'New Partnership'
+    NEWLISTING = 'New Listing'
+    NEWPARTNERSHIP = 'New Partnership'
 
-
+# TODO: Categories 클래스에 있는 각 카테고리에 대해서 필요한 sub 카테고리 추가하기
 sub_categories = {
     'New Listing': ['Coin Name', 'Exchange Name'],
     'New Partnership': ['Coin Name2', 'Exchange Name2'],
@@ -27,7 +28,7 @@ class TextGenerationInput(BaseModel):
         description="Context to summary public notice.",
     )
     category: Categories = Field(
-        Categories.new_listing, 
+        Categories.NEWLISTING, 
         title="Category of public notice"
     )
 
@@ -36,7 +37,6 @@ class TextGenerationOutput(BaseModel):
     output: str
 
 
-# max_length is not used
 def process(context, category):
     data = {
         'context': preprocessor.run(context),
@@ -46,8 +46,11 @@ def process(context, category):
     summary = ''
 
     for i, sub_category in enumerate(sub_categories[category]):
-        # res = requests.post(f'http://localhost/api/{category}/{sub_category}', data=json.dumps(data), headers={"Content-Type": "application/json"})
-        
+        '''
+        TODO
+        - API 연동하기
+        - DUMMY 데이터 삭제(Lorem ipsum...)
+        '''
         res = {
             'summary': 'Lorem ipsum dolor sit amet'
         }
@@ -59,7 +62,7 @@ def process(context, category):
 
 def xangle_context_summary(input: TextGenerationInput) -> TextGenerationOutput:
     """Select category of public notice on sidebar."""
-    context = input.context  # base_text
+    context = input.context
     category = input.category
 
     summary = process(context, category)
