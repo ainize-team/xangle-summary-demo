@@ -1,20 +1,23 @@
 import requests
+import streamlit as st
+
 from enum import Enum
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, HttpUrl
 from nlpretext import Preprocessor
 from nlpretext.basic.preprocess import normalize_whitespace, fix_bad_unicode
+from utils import format_new_listing, format_new_partnership, FORMAT_FUNC
 
 
 preprocessor = Preprocessor()
 preprocessor.pipe(normalize_whitespace)
 preprocessor.pipe(fix_bad_unicode)
 
-# TODO: 필요한 카테고리 더 추가하기
+
 class Categories(str, Enum):
     NEWLISTING = 'New Listing'
     NEWPARTNERSHIP = 'New Partnership'
 
-# TODO: Categories 클래스에 있는 각 카테고리에 대해서 필요한 sub 카테고리 추가하기
+
 SUB_CATEGORIES = {
     'New Listing': [
         "Exchange Name", 
@@ -22,7 +25,8 @@ SUB_CATEGORIES = {
         "Name", 
         "Symbol / Ticker", 
         "Wallet creation and deposit requests opening date", 
-        "Trading opening date", "Withdrawal opening date", 
+        "Trading opening date", 
+        "Withdrawal opening date", 
         "Withdrawal fee", 
         "Announced listing pairs", 
         "Listing price", 
@@ -32,25 +36,34 @@ SUB_CATEGORIES = {
         "Exchange promoted listing/airdrop event",
     ],
     'New Partnership': [
-        "Applicable Date(s)", 
-        "Partnership Details", 
         "Partner's Name", 
         "Counterparty Website", 
         "Counterparty Details", 
-        "Does this partnership generate any kind of revenue?"
-    ],
+        "Does this partnership generate any kind of revenue?", 
+        "Applicable Date(s)", 
+        "Partnership Details"
+    ]
 }
+
+class OtherData(BaseModel):
+    text: str
 
 
 class TextGenerationInput(BaseModel):
-    context: str = Field(
-        ...,
-        title="Input Context",
-        description="Context to summary public notice.",
+    model_url: HttpUrl = Field(
+        '',
+        title="Model URL",
+        description="URL to request API.",
     )
+
     category: Categories = Field(
         Categories.NEWLISTING, 
         title="Category of public notice"
+    )
+
+    context: str = Field(
+        title="Input Context",
+        description="Context to summary public notice.",
     )
 
 
@@ -58,23 +71,17 @@ class TextGenerationOutput(BaseModel):
     output: str
 
 
-def process(context, category):
+def process(model_url, context, category):
     summary = ''
+    outputs = {}
     for i, sub_category in enumerate(SUB_CATEGORIES[category]):
-        '''
-        TODO
-        - API 연동하기
-        - DUMMY 데이터 삭제(Lorem ipsum...)
-        '''
-
-        model_url = 'https://train-mw86iwjxfypsj60gvh84-gpt2-train-teachable-ainize.endpoint.dev.ainize.ai/predictions/xangle-summary'
         headers = {'Content-Type': 'application/json; charset=utf-8'}
         response = requests.post(url=model_url, headers=headers, json={"context": preprocessor.run(context), "category": sub_category})
         output = response.json()
 
-        print(f'{i} => category : {sub_category}, output : {output}')
+        outputs.update({sub_category: output})
 
-        summary += f'{i+1}. {sub_category}' + '\n' + f'{output}' + '\n\n'
+    summary = FORMAT_FUNC[category](outputs)
 
     return summary
 
@@ -83,7 +90,8 @@ def xangle_context_summary(input: TextGenerationInput) -> TextGenerationOutput:
     """Select category of public notice on sidebar."""
     context = input.context
     category = input.category
+    model_url = input.model_url
 
-    summary = process(context, category)
+    summary = process(model_url, context, category)
 
     return TextGenerationOutput(output=summary)
