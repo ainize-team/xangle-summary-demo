@@ -16,8 +16,29 @@ class Categories(str, Enum):
 
 # TODO: Categories 클래스에 있는 각 카테고리에 대해서 필요한 sub 카테고리 추가하기
 SUB_CATEGORIES = {
-    'New Listing': ['Coin Name', 'Exchange Name'],
-    'New Partnership': ['Coin Name2', 'Exchange Name2'],
+    'New Listing': [
+        "Exchange Name", 
+        "Date (Estimated Date)", 
+        "Name", 
+        "Symbol / Ticker", 
+        "Wallet creation and deposit requests opening date", 
+        "Trading opening date", "Withdrawal opening date", 
+        "Withdrawal fee", 
+        "Announced listing pairs", 
+        "Listing price", 
+        "Minimum Trade/Purchase Amount", 
+        "Minimum Price Movement", 
+        "Minimum Order Size", 
+        "Exchange promoted listing/airdrop event",
+    ],
+    'New Partnership': [
+        "Applicable Date(s)", 
+        "Partnership Details", 
+        "Partner's Name", 
+        "Counterparty Website", 
+        "Counterparty Details", 
+        "Does this partnership generate any kind of revenue?"
+    ],
 }
 
 
@@ -38,24 +59,22 @@ class TextGenerationOutput(BaseModel):
 
 
 def process(context, category):
-    data = {
-        'context': preprocessor.run(context),
-        'category': category,
-    }
-
     summary = ''
-
     for i, sub_category in enumerate(SUB_CATEGORIES[category]):
         '''
         TODO
         - API 연동하기
         - DUMMY 데이터 삭제(Lorem ipsum...)
         '''
-        res = {
-            'summary': 'Lorem ipsum dolor sit amet'
-        }
 
-        summary += f'{i+1}. {sub_category}' + '\n' + f'{res["summary"]}' + '\n\n'
+        model_url = 'https://train-mw86iwjxfypsj60gvh84-gpt2-train-teachable-ainize.endpoint.dev.ainize.ai/predictions/xangle-summary'
+        headers = {'Content-Type': 'application/json; charset=utf-8'}
+        response = requests.post(url=model_url, headers=headers, json={"context": preprocessor.run(context), "category": sub_category})
+        output = response.json()
+
+        print(f'{i} => category : {sub_category}, output : {output}')
+
+        summary += f'{i+1}. {sub_category}' + '\n' + f'{output}' + '\n\n'
 
     return summary
 
