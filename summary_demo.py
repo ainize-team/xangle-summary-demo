@@ -1,11 +1,10 @@
 import requests
-import streamlit as st
 
 from enum import Enum
 from pydantic import BaseModel, Field, HttpUrl
 from nlpretext import Preprocessor
 from nlpretext.basic.preprocess import normalize_whitespace, fix_bad_unicode
-from utils import format_new_listing, format_new_partnership, FORMAT_FUNC
+from utils import *
 
 
 preprocessor = Preprocessor()
@@ -44,9 +43,6 @@ SUB_CATEGORIES = {
         "Partnership Details"
     ]
 }
-
-class OtherData(BaseModel):
-    text: str
 
 
 class TextGenerationInput(BaseModel):

@@ -1,4 +1,3 @@
-
 def format_new_listing(outputs):
     summary = f"""
     1. Exchange Name
