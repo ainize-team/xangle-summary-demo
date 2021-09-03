@@ -1,7 +1,8 @@
 import requests
+import streamlit as st
 
 from enum import Enum
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, Field
 from nlpretext import Preprocessor
 from nlpretext.basic.preprocess import normalize_whitespace, fix_bad_unicode
 from utils import *
@@ -12,49 +13,15 @@ preprocessor.pipe(normalize_whitespace)
 preprocessor.pipe(fix_bad_unicode)
 
 
-class Categories(str, Enum):
+class DocumentType(str, Enum):
     NEWLISTING = 'New Listing'
     NEWPARTNERSHIP = 'New Partnership'
 
 
-SUB_CATEGORIES = {
-    'New Listing': [
-        "Exchange Name", 
-        "Date (Estimated Date)", 
-        "Name", 
-        "Symbol / Ticker", 
-        "Wallet creation and deposit requests opening date", 
-        "Trading opening date", 
-        "Withdrawal opening date", 
-        "Withdrawal fee", 
-        "Announced listing pairs", 
-        "Listing price", 
-        "Minimum Trade/Purchase Amount", 
-        "Minimum Price Movement", 
-        "Minimum Order Size", 
-        "Exchange promoted listing/airdrop event",
-    ],
-    'New Partnership': [
-        "Partner's Name", 
-        "Counterparty Website", 
-        "Counterparty Details", 
-        "Does this partnership generate any kind of revenue?", 
-        "Applicable Date(s)", 
-        "Partnership Details"
-    ]
-}
-
-
 class TextGenerationInput(BaseModel):
-    model_url: HttpUrl = Field(
-        '',
-        title="Model URL",
-        description="URL to request API.",
-    )
-
-    category: Categories = Field(
-        Categories.NEWLISTING, 
-        title="Category of public notice"
+    doc_type: DocumentType = Field(
+        DocumentType.NEWLISTING, 
+        title="Type of Document of public notice"
     )
 
     context: str = Field(
@@ -67,27 +34,32 @@ class TextGenerationOutput(BaseModel):
     output: str
 
 
-def process(model_url, context, category):
-    summary = ''
-    outputs = {}
-    for i, sub_category in enumerate(SUB_CATEGORIES[category]):
-        headers = {'Content-Type': 'application/json; charset=utf-8'}
-        response = requests.post(url=model_url, headers=headers, json={"context": preprocessor.run(context), "category": sub_category})
-        output = response.json()
+def process(context: str, doc_type: DocumentType) -> str:
+    query_param = st.experimental_get_query_params()
+    
+    if 'api' in query_param:
+        api_url = query_param['api'][0]
+        try:
+            headers = {'Content-Type': 'application/json; charset=utf-8'}
+            response = requests.post(url=api_url, headers=headers, json={"context": preprocessor.run(context), "docType": doc_type})
 
-        outputs.update({sub_category: output})
+            output = response.json()
 
-    summary = FORMAT_FUNC[category](outputs)
+            results = FORMAT_FUNC[doc_type](output)
+        except:
+            results = 'Endpoint API Internal error occurs.'
 
-    return summary
+    else:
+        results = 'There is no endpoint API in Query String.'
+
+    return results
 
 
 def xangle_context_summary(input: TextGenerationInput) -> TextGenerationOutput:
-    """Select category of public notice on sidebar."""
+    """Select type of Document on sidebar."""
     context = input.context
-    category = input.category
-    model_url = input.model_url
+    doc_type = input.doc_type
 
-    summary = process(model_url, context, category)
+    results = process(context, doc_type)
 
-    return TextGenerationOutput(output=summary)
+    return TextGenerationOutput(output=results)
