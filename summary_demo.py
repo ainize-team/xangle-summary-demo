@@ -44,7 +44,7 @@ def process(context: str, doc_type: DocumentType) -> str:
         api_url = query_param['api'][0]
         try:
             headers = {'Content-Type': 'application/json; charset=utf-8'}
-            response = requests.post(url=api_url, headers=headers, json={"context": context, "docType": doc_type})
+            response = requests.post(url=api_url, headers=headers, json={"context": preprocessor.run(context), "docType": doc_type})
 
             output = response.json()
 
