@@ -36,12 +36,15 @@ class TextGenerationOutput(BaseModel):
 
 def process(context: str, doc_type: DocumentType) -> str:
     query_param = st.experimental_get_query_params()
+
+    if len(context) > 3000:
+        context = context[:3000]
     
     if 'api' in query_param:
         api_url = query_param['api'][0]
         try:
             headers = {'Content-Type': 'application/json; charset=utf-8'}
-            response = requests.post(url=api_url, headers=headers, json={"context": preprocessor.run(context), "docType": doc_type})
+            response = requests.post(url=api_url, headers=headers, json={"context": context, "docType": doc_type})
 
             output = response.json()
 
