@@ -132,7 +132,8 @@ Name: {output["Sponsorships"]["Sponsorships Name"]}
 Details: {output["Sponsorships"]["Sponsorships Details"]}
 
 7. Other relevant information
-Related disclosure: {output["Related disclosure"]}
+Related disclosure: 
+{output["Related disclosure"]}
 """
     return summary
 
@@ -152,7 +153,8 @@ def format_governance_proposal(output):
     Name: {output["Proposer Name"]}
     Category: {output["Proposer Category"]}
 
-5. Details {output["Details"]}
+5. Details
+{output["Details"]}
 """
     return summary
 
@@ -230,7 +232,7 @@ def format_governance_decision(output):
 
 def format_token_swap(output):
     summary = f"""
-1. Applicable Date 
+1. Applicable Date(s)
 {output["Applicable Date(s)"]}
 
 2. Announcement Type 
@@ -328,19 +330,19 @@ Time of Deposit Service Resumption: {output["Time of Deposit Service Resumption"
 
 
 FORMAT_FUNC = {
-    'New Listing': format_new_listing,
-    'New Partnership': format_new_partnership,
-    'Milestone Achievement': format_milestone_achievement,
-    'Major Use Case': format_major_use_case,
-    'IR Event': format_ir_event,
-    'Governance Proposal': format_governance_proposal,
-    'Product Service Roadmap': format_product_service_roadmap,
-    'Fund Raising': format_fundraising,
-    'Roadmap Release': format_roadmap_release,
-    'Governance Decision': format_governance_decision,
-    'Token Swap': format_token_swap,
-    'Exchange Warning Issued': format_exchange_warning_issued,
-    'Fork': format_fork,
-    'Delisting': format_delisting,
-    'Warning Withdrawn': format_warning_withdrawn,
+    'new_listing': format_new_listing,
+    'new_partnership': format_new_partnership,
+    'milestone_achievement': format_milestone_achievement,
+    'major_use_case': format_major_use_case,
+    'ir_event': format_ir_event,
+    'governance_proposal': format_governance_proposal,
+    'product_service_roadmap': format_product_service_roadmap,
+    'fundraising': format_fundraising,
+    'roadmap_release': format_roadmap_release,
+    'governance_decision': format_governance_decision,
+    'token_swap': format_token_swap,
+    'exchange_warning_issued': format_exchange_warning_issued,
+    'fork': format_fork,
+    'delisting': format_delisting,
+    'warning_withdrawn': format_warning_withdrawn,
 }
