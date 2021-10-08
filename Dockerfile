@@ -14,4 +14,4 @@ COPY . .
 
 EXPOSE 8051
 
-CMD ["opyrator", "launch-ui", "summary_demo:xangle_context_summary"]
+CMD ["opyrator", "launch-ui", "summary_demo:xangle_context_summary"] 
