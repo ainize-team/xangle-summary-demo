@@ -14,8 +14,21 @@ preprocessor.pipe(fix_bad_unicode)
 
 
 class DocumentType(str, Enum):
-    NEWLISTING = 'New Listing'
-    NEWPARTNERSHIP = 'New Partnership'
+    NEWLISTING = 'new_listing'
+    NEWPARTNERSHIP = 'new_partnership'
+    MILESTONE_ACHIEVEMENT = 'milestone_achievement'
+    MAJORUSECASE = 'major_use_case'
+    IREVENT = 'ir_event'
+    GOVERNANCE_PROPOSAL = 'governance_proposal'
+    PRODUCT_SERVICE_ROADMAP = 'product_service_roadmap'
+    FUNDRAISING = 'fundraising'
+    ROADMAP_RELEASE = 'roadmap_release'
+    GOVERNANCE_DECISION = 'governance_decision'
+    TOKEN_SWAP = 'token_swap'
+    EXCHANGE_WARNING_ISSUED = 'exchange_warning_issued'
+    FORK = 'fork'
+    DELISTING = 'delisting'
+    WARNING_WITHDRAWN = 'warning_withdrawn'
 
 
 class TextGenerationInput(BaseModel):
